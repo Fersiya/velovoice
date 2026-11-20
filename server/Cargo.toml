@@ -1,8 +1,8 @@
 [package]
 name = "velovoice-server"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
-description = "Ultra-lightweight WebRTC P2P signaling server for small voice groups"
+description = "Ultra-lightweight WebRTC P2P signaling & chat server for VeloVoice"
 
 [dependencies]
 axum = { version = "0.8", features = ["ws"] }
@@ -15,7 +15,6 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 [profile.release]
-opt-level = 3
-lto = true
-codegen-units = 1
+opt-level = "s"
+lto = "thin"
 strip = true

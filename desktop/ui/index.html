@@ -8,132 +8,485 @@
 </head>
 <body>
   <div id="app">
-    <!-- Экран подключения -->
-    <section id="login-view" class="panel login-panel">
-      <div class="brand">
-        <div class="brand-dot"></div>
-        <div>
-          <h1>VeloVoice</h1>
-          <p class="muted">Лёгкий P2P-голос и 1080p60 экран для своей компании</p>
+
+    <!-- ==================== LOGIN / LAUNCHER SCREEN ==================== -->
+    <section id="login-view" class="login-screen">
+      <div class="login-card">
+        <div class="login-header">
+          <div class="brand-logo">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <line x1="12" y1="19" x2="12" y2="22"/>
+            </svg>
+          </div>
+          <div>
+            <h1>VeloVoice <span class="ver-badge">2.0</span></h1>
+            <p class="muted">Лёгкий голос без задержки и 1080p60 трансляция</p>
+          </div>
+          <button type="button" id="btn-login-audio" class="btn-icon-text" title="Настройка и проверка микрофона">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/>
+            </svg>
+            <span>Звук и тест</span>
+          </button>
         </div>
-      </div>
 
-      <form id="join-form" class="form-grid">
-        <label>
-          <span>Твой ник</span>
-          <input id="input-name" type="text" maxlength="24" placeholder="Например, Alex" required />
-        </label>
+        <!-- Mode Tabs -->
+        <div class="mode-tabs" role="tablist">
+          <button type="button" class="mode-tab active" data-mode="host">Создать комнату (Я хост)</button>
+          <button type="button" class="mode-tab" data-mode="join">Подключиться к другу</button>
+        </div>
 
-        <label>
-          <span>Комната</span>
-          <input id="input-room" type="text" maxlength="32" value="squad" required />
-        </label>
+        <form id="join-form" class="form-stack">
+          <!-- Profile row: Avatar + Nick -->
+          <div class="profile-row">
+            <div class="avatar-preview" id="login-avatar-preview">T</div>
+            <div class="profile-inputs">
+              <label>
+                <span>Твой ник</span>
+                <input id="input-name" type="text" maxlength="24" placeholder="Например, Tidus" required />
+              </label>
+              <div class="color-swatches" id="color-swatches" title="Цвет аватарки"></div>
+            </div>
+          </div>
 
-        <label>
-          <span>Пароль комнаты <small>(необязательно)</small></span>
-          <input id="input-pass" type="password" placeholder="Оставь пустым, если без пароля" />
-        </label>
-
-        <label>
-          <span>Адрес сервера сигналинга</span>
-          <input id="input-server" type="text" value="ws://127.0.0.1:9000/ws" required />
-        </label>
-
-        <details class="advanced-box">
-          <summary>Настройки звука и TURN (если у кого-то строгий NAT)</summary>
-          <div class="advanced-grid">
-            <label>
-              <span>Микрофон</span>
-              <select id="select-mic"></select>
-            </label>
-            <label class="checkbox-row">
-              <input id="opt-noise" type="checkbox" checked />
-              <span>Шумоподавление (WebRTC NS)</span>
-            </label>
-            <label class="checkbox-row">
-              <input id="opt-echo" type="checkbox" checked />
-              <span>Эхоподавление (AEC)</span>
-            </label>
-            <label class="checkbox-row">
-              <input id="opt-agc" type="checkbox" />
-              <span>Автоусиление микрофона (AGC)</span>
-            </label>
-            <label>
-              <span>TURN URL <small>(опционально)</small></span>
-              <input id="input-turn-url" type="text" placeholder="turn:your-vps.ru:3478" />
-            </label>
+          <!-- HOST MODE FIELDS -->
+          <div id="host-fields" class="mode-section">
             <div class="two-col">
               <label>
-                <span>TURN логин</span>
-                <input id="input-turn-user" type="text" placeholder="user" />
+                <span>Название комнаты</span>
+                <input id="input-host-room" type="text" maxlength="32" value="squad" />
               </label>
               <label>
-                <span>TURN пароль</span>
-                <input id="input-turn-pass" type="password" placeholder="pass" />
+                <span>Порт встроенного сервера</span>
+                <input id="input-host-port" type="number" min="1024" max="65535" value="9000" />
               </label>
             </div>
-          </div>
-        </details>
-
-        <div id="login-error" class="error-banner hidden"></div>
-        <button type="submit" class="btn btn-primary btn-lg">Подключиться к голосу</button>
-      </form>
-    </section>
-
-    <!-- Основной экран комнаты -->
-    <section id="room-view" class="room-layout hidden">
-      <aside class="sidebar">
-        <div class="room-header">
-          <div>
-            <div class="room-title" id="room-title"># squad</div>
-            <div class="room-meta">
-              <span id="ping-badge" class="pill">Пинг: —</span>
-              <span id="peer-count" class="pill">1 / 5</span>
+            <label>
+              <span>Пароль комнаты <small>(необязательно)</small></span>
+              <input id="input-host-pass" type="password" placeholder="Пусто = вход без пароля" />
+            </label>
+            <div class="info-callout">
+              Сервер запустится автоматически внутри VeloVoice — отдельный <code>server.exe</code> не нужен. После входа ты получишь короткий код приглашения для друзей.
             </div>
           </div>
+
+          <!-- JOIN MODE FIELDS -->
+          <div id="join-fields" class="mode-section hidden">
+            <label>
+              <span>Код приглашения от друга</span>
+              <div class="input-with-btn">
+                <input id="input-invite" type="text" placeholder="Вставь код VV2:..." autocomplete="off" />
+                <button type="button" id="btn-paste-invite" class="btn btn-secondary">Вставить</button>
+              </div>
+            </label>
+            <div id="invite-parsed-badge" class="invite-badge hidden"></div>
+
+            <details class="advanced-box" id="manual-join-details">
+              <summary>Или подключиться вручную (IP / VPS / TURN)</summary>
+              <div class="advanced-grid">
+                <label>
+                  <span>Адрес сервера (WebSocket)</span>
+                  <input id="input-server" type="text" value="ws://127.0.0.1:9000/ws" />
+                </label>
+                <div class="two-col">
+                  <label>
+                    <span>Комната</span>
+                    <input id="input-room" type="text" maxlength="32" value="squad" />
+                  </label>
+                  <label>
+                    <span>Пароль</span>
+                    <input id="input-pass" type="password" placeholder="Необязательно" />
+                  </label>
+                </div>
+                <label>
+                  <span>TURN URL <small>(если строгий NAT)</small></span>
+                  <input id="input-turn-url" type="text" placeholder="turn:your-vps.ru:3478" />
+                </label>
+                <div class="two-col">
+                  <label>
+                    <span>TURN логин</span>
+                    <input id="input-turn-user" type="text" placeholder="user" />
+                  </label>
+                  <label>
+                    <span>TURN пароль</span>
+                    <input id="input-turn-pass" type="password" placeholder="pass" />
+                  </label>
+                </div>
+              </div>
+            </details>
+          </div>
+
+          <div id="login-error" class="error-banner hidden"></div>
+
+          <button type="submit" id="btn-submit-join" class="btn btn-primary btn-lg">
+            Создать комнату и войти
+          </button>
+        </form>
+
+        <div class="login-footer">
+          <span id="login-ram-pill" class="ram-pill" title="Суммарное потребление памяти VeloVoice + WebView2">RAM: расчёт…</span>
+          <span class="muted">WebRTC P2P • Opus 48 кГц • 1080p60</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MAIN DISCORD-STYLE WORKSPACE ==================== -->
+    <section id="room-view" class="workspace hidden">
+
+      <!-- Left Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="channel-info">
+            <div class="channel-title-row">
+              <svg class="channel-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+              </svg>
+              <span id="room-title" class="room-title">squad</span>
+            </div>
+            <div class="channel-sub">
+              <span id="conn-dot" class="conn-dot good"></span>
+              <span id="ping-badge">Пинг: —</span>
+              <span class="dot-sep">•</span>
+              <span id="host-badge" class="host-tag hidden">ХОСТ</span>
+            </div>
+          </div>
+          <button id="btn-open-invite" class="btn-square" title="Пригласить друзей">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <line x1="19" y1="8" x2="19" y2="14"/>
+              <line x1="22" y1="11" x2="16" y2="11"/>
+            </svg>
+          </button>
         </div>
 
-        <div class="section-label">Участники</div>
+        <div class="sidebar-section-header">
+          <span>В ГОЛОСОВОМ КАНАЛЕ</span>
+          <span id="peer-count" class="count-pill">1 / 8</span>
+        </div>
+
         <div id="peers-list" class="peers-list"></div>
 
-        <div class="controls-bar">
-          <button id="btn-mute" class="btn btn-ctrl" title="Выключить/включить микрофон (M)">
-            Микрофон: ВКЛ
-          </button>
-          <button id="btn-deafen" class="btn btn-ctrl" title="Отключить звук всех (D)">
-            Звук: ВКЛ
-          </button>
-          <button id="btn-share" class="btn btn-accent" title="Трансляция экрана 1080p 60fps + звук">
-            Экран 1080p60
-          </button>
-          <button id="btn-leave" class="btn btn-danger">
-            Выйти
-          </button>
+        <!-- Live RAM Monitor -->
+        <div class="ram-bar" id="room-ram-bar" title="Общая память VeloVoice + все процессы WebView2">
+          <div class="ram-bar-top">
+            <span>Память (всё вместе)</span>
+            <strong id="room-ram-total">— МБ</strong>
+          </div>
+          <div class="ram-bar-sub" id="room-ram-detail">Ядро Rust + WebView2</div>
+        </div>
+
+        <!-- Bottom User Dock (Discord Style) -->
+        <div class="user-dock">
+          <div class="dock-user" id="dock-self-card">
+            <div class="dock-avatar-wrap">
+              <div class="avatar sm" id="dock-avatar">T</div>
+              <span class="online-dot"></span>
+            </div>
+            <div class="dock-meta">
+              <div class="dock-name" id="dock-name">Tidus</div>
+              <div class="dock-status" id="dock-status">В голосе</div>
+            </div>
+          </div>
+          <div class="dock-actions">
+            <button id="btn-mute" class="dock-btn" title="Микрофон (M)">
+              <svg id="icon-mic-on" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                <line x1="12" y1="19" x2="12" y2="22"/>
+              </svg>
+              <svg id="icon-mic-off" class="hidden" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="2" y1="2" x2="22" y2="22"/>
+                <path d="M18.89 13.23A7.12 7.12 0 0 0 19 12v-2"/>
+                <path d="M5 10v2a7 7 0 0 0 12 5"/>
+                <path d="M15 9.34V5a3 3 0 0 0-5.68-1.33"/>
+                <path d="M9 9v3a3 3 0 0 0 5.12 2.12"/>
+                <line x1="12" y1="19" x2="12" y2="22"/>
+              </svg>
+            </button>
+            <button id="btn-deafen" class="dock-btn" title="Звук (D)">
+              <svg id="icon-deaf-off" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/>
+              </svg>
+              <svg id="icon-deaf-on" class="hidden" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="2" y1="2" x2="22" y2="22"/>
+                <path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 15.36-6.36"/>
+                <path d="M21 12v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3"/>
+              </svg>
+            </button>
+            <button id="btn-audio-settings" class="dock-btn" title="Настройки звука и тест микрофона">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/>
+              </svg>
+            </button>
+          </div>
         </div>
       </aside>
 
-      <main class="stage">
-        <div id="stage-empty" class="stage-empty">
-          <div class="empty-card">
-            <h2>Голосовой канал активен</h2>
-            <p class="muted">
-              Нажми <strong>«Экран 1080p60»</strong> слева, чтобы запустить трансляцию экрана со звуком.
-              При выборе экрана поставь галочку <em>«Поделиться системным аудио»</em>.
-            </p>
-            <div class="hint-row">
-              <span><strong>M</strong> — мут микрофона</span>
-              <span><strong>D</strong> — отключить звук</span>
-              <span>Громкость каждого участника: <strong>0–200%</strong></span>
+      <!-- Main Stage Area -->
+      <main class="stage-wrap">
+        <header class="stage-topbar">
+          <div class="topbar-left">
+            <span class="topbar-title" id="topbar-room-name"># squad</span>
+            <span class="topbar-pill" id="topbar-voice-hint">Голос активен</span>
+          </div>
+          <div class="topbar-right">
+            <button id="btn-share" class="btn btn-stream">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+              </svg>
+              <span>Экран 1080p60</span>
+            </button>
+            <button id="btn-toggle-chat" class="btn btn-secondary btn-chat-toggle" title="Текстовый чат комнаты">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+              <span>Чат</span>
+              <span id="chat-unread-badge" class="unread-badge hidden">0</span>
+            </button>
+            <button id="btn-leave" class="btn btn-danger" title="Отключиться от комнаты">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"/>
+                <line x1="22" y1="2" x2="2" y2="22"/>
+              </svg>
+              <span>Выйти</span>
+            </button>
+          </div>
+        </header>
+
+        <div class="stage-body">
+          <!-- Streams View (shown when >=1 stream active) -->
+          <div id="streams-grid" class="streams-grid hidden"></div>
+
+          <!-- Voice Participant Tiles Grid (Discord voice stage) -->
+          <div id="voice-grid" class="voice-grid"></div>
+        </div>
+
+        <!-- Bottom quick voice meter bar -->
+        <div class="stage-footer">
+          <div class="mic-live-indicator">
+            <span class="mic-live-dot" id="footer-mic-dot"></span>
+            <span id="footer-mic-label">Микрофон слушает</span>
+            <div class="mini-vu-track">
+              <div class="mini-vu-fill" id="footer-vu-fill"></div>
             </div>
+          </div>
+          <div class="shortcut-hints">
+            <span><kbd>M</kbd> Мут</span>
+            <span><kbd>D</kbd> Звук</span>
+            <span><kbd>T</kbd> Чат</span>
+          </div>
+        </div>
+      </main>
+
+      <!-- Collapsible Right Text Chat Drawer -->
+      <aside id="chat-drawer" class="chat-drawer hidden">
+        <div class="chat-header">
+          <span>Чат комнаты</span>
+          <button id="btn-close-chat" class="btn-icon-sm" title="Скрыть чат">✕</button>
+        </div>
+        <div id="chat-messages" class="chat-messages">
+          <div class="chat-system">Сообщения видны только текущим участникам комнаты и не сохраняются на сервере.</div>
+        </div>
+        <form id="chat-form" class="chat-input-bar">
+          <input id="chat-input" type="text" maxlength="1000" placeholder="Написать сообщение..." autocomplete="off" />
+          <button type="submit" class="btn btn-primary btn-sm">→</button>
+        </form>
+      </aside>
+    </section>
+
+    <!-- ==================== MODAL: AUDIO SETTINGS & MIC TEST ==================== -->
+    <div id="modal-audio" class="modal-backdrop hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>Настройки звука и проверка микрофона</h2>
+          <button class="btn-icon-sm" data-close-modal="modal-audio">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="device-row">
+            <label class="flex-1">
+              <span>Устройство ввода (Микрофон)</span>
+              <select id="select-mic"></select>
+            </label>
+            <button type="button" id="btn-refresh-devices" class="btn btn-secondary" title="Обновить список устройств">Обновить</button>
+          </div>
+
+          <label>
+            <span>Устройство вывода (Наушники / Колонки)</span>
+            <select id="select-speaker"></select>
+          </label>
+
+          <!-- Live Mic Test Box -->
+          <div class="mic-test-box">
+            <div class="mic-test-header">
+              <span>Проверка микрофона</span>
+              <span id="mic-test-state" class="mic-state-pill">Тишина</span>
+            </div>
+
+            <div class="vu-meter-wrap">
+              <div class="vu-meter-track">
+                <div id="test-vu-fill" class="vu-meter-fill"></div>
+                <div id="test-vad-marker" class="vu-vad-marker" title="Порог срабатывания голоса"></div>
+              </div>
+            </div>
+
+            <label class="vad-row">
+              <div class="vad-row-top">
+                <span>Порог активации голоса (индикатор речи)</span>
+                <strong id="vad-val-label">15%</strong>
+              </div>
+              <input id="input-vad-threshold" type="range" min="2" max="60" value="15" />
+            </label>
+
+            <div class="mic-test-actions">
+              <button type="button" id="btn-toggle-mic-test" class="btn btn-primary">
+                Включить тест и слышать себя
+              </button>
+              <span class="muted small-note">Услышишь свой реальный голос с учётом шумодава</span>
+            </div>
+          </div>
+
+          <div class="toggles-grid">
+            <label class="toggle-card">
+              <input id="opt-noise" type="checkbox" checked />
+              <div>
+                <strong>Шумоподавление (NS)</strong>
+                <small>Убирает шум вентиляторов и клавиатуры</small>
+              </div>
+            </label>
+            <label class="toggle-card">
+              <input id="opt-echo" type="checkbox" checked />
+              <div>
+                <strong>Эхоподавление (AEC)</strong>
+                <small>Убирает звук колонок из микрофона</small>
+              </div>
+            </label>
+            <label class="toggle-card">
+              <input id="opt-agc" type="checkbox" />
+              <div>
+                <strong>Автоусиление (AGC)</strong>
+                <small>Выравнивает громкость речи</small>
+              </div>
+            </label>
+            <label class="toggle-card">
+              <input id="opt-sfx" type="checkbox" checked />
+              <div>
+                <strong>Звуки интерфейса</strong>
+                <small>Мягкие сигналы входа, выхода и мута</small>
+              </div>
+            </label>
           </div>
         </div>
 
-        <div id="streams-grid" class="streams-grid hidden"></div>
-      </main>
-    </section>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-close-modal="modal-audio">Готово</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== MODAL: STREAM SETTINGS (GO LIVE) ==================== -->
+    <div id="modal-stream" class="modal-backdrop hidden">
+      <div class="modal-card modal-sm">
+        <div class="modal-header">
+          <h2>Запустить трансляцию экрана</h2>
+          <button class="btn-icon-sm" data-close-modal="modal-stream">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="two-col">
+            <label>
+              <span>Разрешение</span>
+              <select id="stream-res">
+                <option value="1280x720">720p (HD)</option>
+                <option value="1920x1080" selected>1080p (Full HD)</option>
+                <option value="2560x1440">1440p (2K)</option>
+              </select>
+            </label>
+            <label>
+              <span>Частота кадров</span>
+              <select id="stream-fps">
+                <option value="30">30 FPS</option>
+                <option value="60" selected>60 FPS (плавно)</option>
+              </select>
+            </label>
+          </div>
+
+          <label>
+            <span>Макс. битрейт на каждого зрителя</span>
+            <select id="stream-bitrate">
+              <option value="3500000">3.5 Мбит/с (экономия канала)</option>
+              <option value="6000000" selected>6 Мбит/с (оптимально 1080p60)</option>
+              <option value="9000000">9 Мбит/с (макс. чёткость)</option>
+            </select>
+          </label>
+
+          <label class="toggle-card">
+            <input id="stream-audio" type="checkbox" checked />
+            <div>
+              <strong>Транслировать системный звук</strong>
+              <small>В окне выбора экрана Windows включи «Поделиться аудио»</small>
+            </div>
+          </label>
+
+          <div class="info-callout warn">
+            <strong>Не видно нужное окно?</strong> Windows скрывает свёрнутые в панель задач окна из списка захвата. Разверни игру/окно на фоне перед стартом — или выбери захват всего экрана.
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal="modal-stream">Отмена</button>
+          <button type="button" id="btn-confirm-stream" class="btn btn-primary">Выбрать экран →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== MODAL: INVITE FRIENDS ==================== -->
+    <div id="modal-invite" class="modal-backdrop hidden">
+      <div class="modal-card modal-sm">
+        <div class="modal-header">
+          <h2>Пригласить друзей в комнату</h2>
+          <button class="btn-icon-sm" data-close-modal="modal-invite">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <div id="invite-host-endpoints" class="hidden">
+            <label>
+              <span>Через какой адрес будут подключаться друзья</span>
+              <select id="select-invite-endpoint"></select>
+            </label>
+          </div>
+
+          <label>
+            <span>Код приглашения (скинь другу в Telegram / Discord)</span>
+            <div class="input-with-btn">
+              <input id="invite-code-output" type="text" readonly />
+              <button type="button" id="btn-copy-invite" class="btn btn-primary">Копировать</button>
+            </div>
+          </label>
+
+          <div class="info-callout">
+            <strong>Как другу зайти:</strong> открывает VeloVoice → вкладка <em>«Подключиться к другу»</em> → вставляет этот код.<br/><br/>
+            Если вы в разных квартирах: используйте <strong>Tailscale</strong> (выбери сверху адрес <code>100.x.x.x</code>) — всё соединится напрямую без проброса портов.
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal="modal-invite">Закрыть</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div id="toast" class="toast hidden"></div>
+
   </div>
 
-  <!-- Скрытый контейнер для служебных <audio> (workaround Web Audio API в Chromium/WebView2) -->
+  <!-- Hidden sink for Chromium/WebView2 Web Audio API WebRTC workaround -->
   <div id="hidden-audio-sink" style="display:none"></div>
 
   <script src="app.js"></script>
