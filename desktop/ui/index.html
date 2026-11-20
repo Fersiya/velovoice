@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VeloVoice</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Экран подключения -->
+    <section id="login-view" class="panel login-panel">
+      <div class="brand">
+        <div class="brand-dot"></div>
+        <div>
+          <h1>VeloVoice</h1>
+          <p class="muted">Лёгкий P2P-голос и 1080p60 экран для своей компании</p>
+        </div>
+      </div>
+
+      <form id="join-form" class="form-grid">
+        <label>
+          <span>Твой ник</span>
+          <input id="input-name" type="text" maxlength="24" placeholder="Например, Alex" required />
+        </label>
+
+        <label>
+          <span>Комната</span>
+          <input id="input-room" type="text" maxlength="32" value="squad" required />
+        </label>
+
+        <label>
+          <span>Пароль комнаты <small>(необязательно)</small></span>
+          <input id="input-pass" type="password" placeholder="Оставь пустым, если без пароля" />
+        </label>
+
+        <label>
+          <span>Адрес сервера сигналинга</span>
+          <input id="input-server" type="text" value="ws://127.0.0.1:9000/ws" required />
+        </label>
+
+        <details class="advanced-box">
+          <summary>Настройки звука и TURN (если у кого-то строгий NAT)</summary>
+          <div class="advanced-grid">
+            <label>
+              <span>Микрофон</span>
+              <select id="select-mic"></select>
+            </label>
+            <label class="checkbox-row">
+              <input id="opt-noise" type="checkbox" checked />
+              <span>Шумоподавление (WebRTC NS)</span>
+            </label>
+            <label class="checkbox-row">
+              <input id="opt-echo" type="checkbox" checked />
+              <span>Эхоподавление (AEC)</span>
+            </label>
+            <label class="checkbox-row">
+              <input id="opt-agc" type="checkbox" />
+              <span>Автоусиление микрофона (AGC)</span>
+            </label>
+            <label>
+              <span>TURN URL <small>(опционально)</small></span>
+              <input id="input-turn-url" type="text" placeholder="turn:your-vps.ru:3478" />
+            </label>
+            <div class="two-col">
+              <label>
+                <span>TURN логин</span>
+                <input id="input-turn-user" type="text" placeholder="user" />
+              </label>
+              <label>
+                <span>TURN пароль</span>
+                <input id="input-turn-pass" type="password" placeholder="pass" />
+              </label>
+            </div>
+          </div>
+        </details>
+
+        <div id="login-error" class="error-banner hidden"></div>
+        <button type="submit" class="btn btn-primary btn-lg">Подключиться к голосу</button>
+      </form>
+    </section>
+
+    <!-- Основной экран комнаты -->
+    <section id="room-view" class="room-layout hidden">
+      <aside class="sidebar">
+        <div class="room-header">
+          <div>
+            <div class="room-title" id="room-title"># squad</div>
+            <div class="room-meta">
+              <span id="ping-badge" class="pill">Пинг: —</span>
+              <span id="peer-count" class="pill">1 / 5</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-label">Участники</div>
+        <div id="peers-list" class="peers-list"></div>
+
+        <div class="controls-bar">
+          <button id="btn-mute" class="btn btn-ctrl" title="Выключить/включить микрофон (M)">
+            Микрофон: ВКЛ
+          </button>
+          <button id="btn-deafen" class="btn btn-ctrl" title="Отключить звук всех (D)">
+            Звук: ВКЛ
+          </button>
+          <button id="btn-share" class="btn btn-accent" title="Трансляция экрана 1080p 60fps + звук">
+            Экран 1080p60
+          </button>
+          <button id="btn-leave" class="btn btn-danger">
+            Выйти
+          </button>
+        </div>
+      </aside>
+
+      <main class="stage">
+        <div id="stage-empty" class="stage-empty">
+          <div class="empty-card">
+            <h2>Голосовой канал активен</h2>
+            <p class="muted">
+              Нажми <strong>«Экран 1080p60»</strong> слева, чтобы запустить трансляцию экрана со звуком.
+              При выборе экрана поставь галочку <em>«Поделиться системным аудио»</em>.
+            </p>
+            <div class="hint-row">
+              <span><strong>M</strong> — мут микрофона</span>
+              <span><strong>D</strong> — отключить звук</span>
+              <span>Громкость каждого участника: <strong>0–200%</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <div id="streams-grid" class="streams-grid hidden"></div>
+      </main>
+    </section>
+  </div>
+
+  <!-- Скрытый контейнер для служебных <audio> (workaround Web Audio API в Chromium/WebView2) -->
+  <div id="hidden-audio-sink" style="display:none"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
